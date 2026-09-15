@@ -47,4 +47,31 @@ class SpringBootCrudExample2ApplicationTests {
 				.andExpect(jsonPath("$[0].name", is("Laptop")));
 	}
 
+	@Test
+	void v2SearchSupportsPagination() throws Exception {
+		mockMvc.perform(get("/v2/products/search")
+					.param("keyword", "laptop")
+					.param("page", "0")
+					.param("size", "1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.content", hasSize(1)))
+				.andExpect(jsonPath("$.totalElements", is(2)));
+	}
+
+	@Test
+	void v2SearchRejectsInvalidParameters() throws Exception {
+		mockMvc.perform(get("/v2/products/search").param("keyword", " "))
+				.andExpect(status().isBadRequest());
+
+		mockMvc.perform(get("/v2/products/search")
+					.param("keyword", "laptop")
+					.param("page", "-1"))
+				.andExpect(status().isBadRequest());
+
+		mockMvc.perform(get("/v2/products/search")
+					.param("keyword", "laptop")
+					.param("size", "101"))
+				.andExpect(status().isBadRequest());
+	}
+
 }

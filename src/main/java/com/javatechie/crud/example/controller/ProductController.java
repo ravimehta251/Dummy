@@ -3,6 +3,7 @@ package com.javatechie.crud.example.controller;
 import com.javatechie.crud.example.entity.Product;
 import com.javatechie.crud.example.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ public class ProductController {
     @Autowired
     private ProductService service;
 
-    @GetMapping({"/health", "/v1/health"})
+    @GetMapping({"/health", "/v1/health", "/v2/health"})
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of("status", "UP", "version", "v1"));
     }
@@ -37,7 +38,7 @@ public class ProductController {
         return service.saveProducts(products);
     }
 
-    @GetMapping({"/products", "/v1/products"})
+    @GetMapping({"/products", "/v1/products", "/v2/products"})
     public List<Product> findAllProducts() {
         return service.getProducts();
     }
@@ -45,6 +46,24 @@ public class ProductController {
     @GetMapping("/v1.1/products/search")
     public ResponseEntity<List<Product>> searchV11(@RequestParam String keyword) {
         return ResponseEntity.ok(service.searchProducts(keyword));
+    }
+
+    @GetMapping("/v2/products/search")
+    public ResponseEntity<?> searchV2(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        if (keyword == null || keyword.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "keyword must not be blank"));
+        }
+        if (page < 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "page must be zero or greater"));
+        }
+        if (size < 1 || size > 100) {
+            return ResponseEntity.badRequest().body(Map.of("error", "size must be between 1 and 100"));
+        }
+        Page<Product> results = service.searchProducts(keyword.trim(), page, size);
+        return ResponseEntity.ok(results);
     }
 
     @GetMapping("/productById/{id}")

@@ -3,6 +3,8 @@ package com.javatechie.crud.example.service;
 import com.javatechie.crud.example.entity.Product;
 import com.javatechie.crud.example.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +28,10 @@ public class ProductService {
 
     public List<Product> searchProducts(String keyword) {
         return repository.findByNameContainingIgnoreCase(keyword);
+    }
+
+    public Page<Product> searchProducts(String keyword, int page, int size) {
+        return repository.findByNameContainingIgnoreCase(keyword, PageRequest.of(page, size));
     }
 
     public Product getProductById(int id) {
