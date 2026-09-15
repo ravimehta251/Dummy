@@ -36,6 +36,15 @@ class SpringBootCrudExample2ApplicationTests {
 	void v1ProductsReturnsSeededProducts() throws Exception {
 		mockMvc.perform(get("/v1/products").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(4)));
+	}
+
+	@Test
+	void v11SearchFindsProductsByKeyword() throws Exception {
+		mockMvc.perform(get("/v1.1/products/search").param("keyword", "laptop"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$[0].name", is("Laptop")));
 	}
 
 }

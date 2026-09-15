@@ -24,6 +24,10 @@ public class ProductService {
         return repository.findAll();
     }
 
+    public List<Product> searchProducts(String keyword) {
+        return repository.findByNameContainingIgnoreCase(keyword);
+    }
+
     public Product getProductById(int id) {
         return repository.findById(id).orElse(null);
     }

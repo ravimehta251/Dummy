@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -39,6 +40,11 @@ public class ProductController {
     @GetMapping({"/products", "/v1/products"})
     public List<Product> findAllProducts() {
         return service.getProducts();
+    }
+
+    @GetMapping("/v1.1/products/search")
+    public ResponseEntity<List<Product>> searchV11(@RequestParam String keyword) {
+        return ResponseEntity.ok(service.searchProducts(keyword));
     }
 
     @GetMapping("/productById/{id}")
