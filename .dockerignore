@@ -1,0 +1,7 @@
+.git
+.idea
+target
+*.iml
+README.md
+CHANGELOG.md
+SYSTEM_DESIGN.md

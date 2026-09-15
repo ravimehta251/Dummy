@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Run tests and build application
+        run: mvn --batch-mode verify
+
+      - name: Build local Docker image
+        run: docker build --tag product-catalogue:ci .
+
+      - name: Smoke test Docker image
+        run: |
+          docker run --detach --name product-catalogue-ci --publish 8080:8080 product-catalogue:ci
+          for attempt in {1..30}; do
+            curl --fail http://localhost:8080/v1/health && exit 0
+            sleep 2
+          done
+          docker logs product-catalogue-ci
+          exit 1
+
+      - name: Remove local test container
+        if: always()
+        run: docker rm --force product-catalogue-ci || true
+
+# GitHub-hosted runners cannot access a developer's local Minikube cluster.
+# Kubernetes deployment is therefore performed manually on the Windows host.

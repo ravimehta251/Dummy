@@ -23,7 +23,7 @@ public class ProductController {
     @Autowired
     private ProductService service;
 
-    @GetMapping({"/health", "/v1/health", "/v2/health"})
+    @GetMapping({"/health", "/v1/health", "/v1.1/health", "/v2/health"})
     public ResponseEntity<Map<String, String>> health() {
         return ResponseEntity.ok(Map.of("status", "UP", "version", "v1"));
     }
